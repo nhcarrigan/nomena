@@ -5,7 +5,7 @@
  */
 
 import { Anthropic } from "@anthropic-ai/sdk";
-import { GoogleGenAI, PersonGeneration } from "@google/genai";
+import { GoogleGenAI, PersonGeneration, SafetyFilterLevel } from "@google/genai";
 import { AttachmentBuilder, type MessageCreateOptions } from "discord.js";
 
 /**
@@ -85,11 +85,12 @@ export class Ai {
   private async generateImage(prompt: string): Promise<Buffer | null> {
     const response = await this.gemini.models.generateImages({
       config: {
-        aspectRatio:      "3:4",
-        imageSize:        "2K",
-        numberOfImages:   1,
-        outputMimeType:   "image/png",
-        personGeneration: PersonGeneration.ALLOW_ADULT,
+        aspectRatio:       "3:4",
+        imageSize:         "2K",
+        numberOfImages:    1,
+        outputMimeType:    "image/png",
+        personGeneration:  PersonGeneration.ALLOW_ADULT,
+        safetyFilterLevel: SafetyFilterLevel.BLOCK_NONE,
       },
       model:  "models/imagen-4.0-generate-001",
       prompt: prompt,
