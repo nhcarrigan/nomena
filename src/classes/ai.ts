@@ -50,7 +50,7 @@ export class Ai {
         join(", ")}`,
       prompt,
     );
-    const image = await this.generateImage(`Your task is to generate a full body anime girl mascot for this project. The image should have a transparent background. NEVER include text in the image. The project description is: ${prompt}`);
+    const image = await this.generateImage(`Your task is to generate a full body anime girl mascot for this project. This means the full character should be visible. The image should have a transparent background. NEVER include text in the image. The project description is: ${prompt}`);
     if (image === null) {
       return { content: `Project Name: ${names}\nProject Description: ${prompt}\nSorry, I was unable to generate an image for you.` };
     }
