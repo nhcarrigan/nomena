@@ -50,7 +50,7 @@ export class Ai {
         join(", ")}`,
       prompt,
     );
-    const image = await this.generateImage(`Your task is to generate a full body anime girl mascot for this project. The image should have a transparent background. The project description is: ${prompt}`);
+    const image = await this.generateImage(`Your task is to generate a full body anime girl mascot for this project. The image should have a transparent background. NEVER include text in the image. The project description is: ${prompt}`);
     if (image === null) {
       return { content: `Project Name: ${names}\nProject Description: ${prompt}\nSorry, I was unable to generate an image for you.` };
     }
@@ -87,7 +87,6 @@ export class Ai {
       config: {
         aspectRatio:      "3:4",
         imageSize:        "2K",
-        negativePrompt:   `(text, text on the image, text in the background, text in the foreground, text in the object, text in the person, text in the animal, missing fingers, malformed hands, malformed feet, malformed legs, malformed arms, malformed torso, malformed head, malformed face, malformed eyes, malformed ears, malformed nose, malformed mouth, malformed hair, malformed clothing, malformed accessories, malformed background, malformed object, malformed person, malformed animal, malformed plant)`,
         numberOfImages:   1,
         outputMimeType:   "image/png",
         personGeneration: PersonGeneration.ALLOW_ADULT,
