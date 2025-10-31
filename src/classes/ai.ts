@@ -5,7 +5,9 @@
  */
 
 import { Anthropic } from "@anthropic-ai/sdk";
-import { GoogleGenAI, PersonGeneration } from "@google/genai";
+import {
+  GoogleGenAI,
+} from "@google/genai";
 import { AttachmentBuilder, type MessageCreateOptions } from "discord.js";
 
 /**
@@ -34,14 +36,15 @@ export class Ai {
    * @param prompt - The user's prompt for the project.
    * @returns A message create options object containing the project name, description, and image.
    */
-  public async generateProjectInfo(prompt: string):
-  Promise<MessageCreateOptions> {
+  public async generateProjectInfo(
+    prompt: string,
+  ): Promise<MessageCreateOptions> {
     const projectRequest = await fetch(
       "https://data.nhcarrigan.com/projects.json",
     );
     const projectResponse
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Fetch does not accept a generic.
-     = (await projectRequest.json()) as Array<{ name: string }>;
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Fetch does not accept a generic.
+      = (await projectRequest.json()) as Array<{ name: string }>;
     const names = await this.generateText(
       `Your task is to generate a project name based on the user's description. Provide ONLY a list of 1-5 fitting names, and an explanation for why you chose them. Note that project names should be unique. Here's a list of all existing project names: ${projectResponse.
         map((p) => {
@@ -50,12 +53,16 @@ export class Ai {
         join(", ")}`,
       prompt,
     );
-    const image = await this.generateImage(`Your task is to generate a full body anime girl mascot for this project. The image should have a transparent background. NEVER include text in the image. The project description is: ${prompt}`);
+    const image = await this.generateImage(prompt);
     if (image === null) {
-      return { content: `Project Name: ${names}\nProject Description: ${prompt}\nSorry, I was unable to generate an image for you.` };
+      return {
+        content: `Project Name: ${names}\nProject Description: ${prompt}\nSorry, I was unable to generate an image for you.`,
+      };
     }
-    return { content: `Project Name: ${names}\nProject Description: ${prompt}`,
-      files:   [ new AttachmentBuilder(image, { name: "avatar.png" }) ] };
+    return {
+      content: `Project Name: ${names}\nProject Description: ${prompt}`,
+      files:   [ new AttachmentBuilder(image, { name: "avatar.png" }) ],
+    };
   }
 
   private async generateText(system: string, prompt: string): Promise<string> {
@@ -83,18 +90,19 @@ export class Ai {
   }
 
   private async generateImage(prompt: string): Promise<Buffer | null> {
-    const response = await this.gemini.models.generateImages({
+    const response = await this.gemini.models.generateContent({
       config: {
-        aspectRatio:      "3:4",
-        imageSize:        "2K",
-        numberOfImages:   1,
-        outputMimeType:   "image/png",
-        personGeneration: PersonGeneration.ALLOW_ADULT,
+        imageConfig: { aspectRatio: "3:4" },
+        systemInstruction:
+          `Your task is to generate a full body anime girl mascot for this project. This means the full character should be visible. The image should have a white background. NEVER include text in the image, no text anywhere at all. The project description is provided by the user.`,
       },
-      model:  "models/imagen-4.0-generate-001",
-      prompt: prompt,
+      contents: prompt,
+      model:    "gemini-2.5-flash-image",
     });
-    const base64 = response.generatedImages?.[0]?.image?.imageBytes;
+    const image = response.candidates?.[0]?.content?.parts?.find((p) => {
+      return Boolean(p.inlineData);
+    });
+    const base64 = image?.inlineData?.data;
     if (base64 === undefined) {
       return null;
     }

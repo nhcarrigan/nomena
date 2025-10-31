@@ -3,18 +3,19 @@
  * @license Naomi's Public License
  * @author Naomi Carrigan
  */
-import Anthropic from "@anthropic-ai/sdk";
-import { GoogleGenAI, PersonGeneration } from "@google/genai";
+import { Anthropic } from "@anthropic-ai/sdk";
+import { GoogleGenAI, } from "@google/genai";
 import { AttachmentBuilder } from "discord.js";
 /**
- *
+ * Utility class for generating project information and images.
  */
 export class Ai {
     anthropic;
     gemini;
     /**
-     * @param anthropicKey
-     * @param geminiKey
+     * Creates a new instance of the Ai class.
+     * @param anthropicKey - The API key for the Anthropic API.
+     * @param geminiKey - The API key for the Gemini API.
      */
     constructor(anthropicKey, geminiKey) {
         this.anthropic = new Anthropic({
@@ -25,7 +26,9 @@ export class Ai {
         });
     }
     /**
-     * @param prompt
+     * Generates a list of potential project names and a full body anime girl mascot for the project.
+     * @param prompt - The user's prompt for the project.
+     * @returns A message create options object containing the project name, description, and image.
      */
     async generateProjectInfo(prompt) {
         const projectRequest = await fetch("https://data.nhcarrigan.com/projects.json");
@@ -37,19 +40,20 @@ export class Ai {
             return p.name;
         }).
             join(", ")}`, prompt);
-        const image = await this.generateImage(`Your task is to generate a full body anime girl mascot for this project. The image should have a transparent background. Potential names: ${names}. The project description is: ${prompt}`);
+        const image = await this.generateImage(prompt);
         if (image === null) {
-            return { content: `Project Name: ${names}\nProject Description: ${prompt}\nSorry, I was unable to generate an image for you.` };
+            return {
+                content: `Project Name: ${names}\nProject Description: ${prompt}\nSorry, I was unable to generate an image for you.`,
+            };
         }
-        return { content: `Project Name: ${names}\nProject Description: ${prompt}`,
-            files: [new AttachmentBuilder(image, { name: "avatar.png" })] };
+        return {
+            content: `Project Name: ${names}\nProject Description: ${prompt}`,
+            files: [new AttachmentBuilder(image, { name: "avatar.png" })],
+        };
     }
-    /**
-     * @param system
-     * @param prompt
-     */
     async generateText(system, prompt) {
         const response = await this.anthropic.messages.create({
+            // eslint-disable-next-line @typescript-eslint/naming-convention -- SDK requirement.
             max_tokens: 1000,
             messages: [
                 {
@@ -70,22 +74,19 @@ export class Ai {
             join("");
         return text;
     }
-    /**
-     * @param prompt
-     */
     async generateImage(prompt) {
-        const response = await this.gemini.models.generateImages({
+        const response = await this.gemini.models.generateContent({
             config: {
-                aspectRatio: "3:4",
-                imageSize: "2K",
-                numberOfImages: 1,
-                outputMimeType: "image/png",
-                personGeneration: PersonGeneration.ALLOW_ADULT,
+                imageConfig: { aspectRatio: "3:4" },
+                systemInstruction: "Your task is to generate a full body anime girl mascot for this project. This means the full character should be visible. The image should have a white background. NEVER include text in the image, no text anywhere at all. The project description is provided by the user.",
             },
-            model: "models/imagen-4.0-generate-001",
-            prompt: prompt,
+            contents: prompt,
+            model: "gemini-2.5-flash-image",
         });
-        const base64 = response.generatedImages?.[0]?.image?.imageBytes;
+        const image = response.candidates?.[0]?.content?.parts?.find((p) => {
+            return Boolean(p.inlineData);
+        });
+        const base64 = image?.inlineData?.data;
         if (base64 === undefined) {
             return null;
         }
