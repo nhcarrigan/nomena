@@ -87,6 +87,7 @@ export class Ai {
       config: {
         aspectRatio:      "3:4",
         imageSize:        "2K",
+        negativePrompt:   `(text, text on the image, text in the background, text in the foreground, text in the object, text in the person, text in the animal, missing fingers, malformed hands, malformed feet, malformed legs, malformed arms, malformed torso, malformed head, malformed face, malformed eyes, malformed ears, malformed nose, malformed mouth, malformed hair, malformed clothing, malformed accessories, malformed background, malformed object, malformed person, malformed animal, malformed plant)`,
         numberOfImages:   1,
         outputMimeType:   "image/png",
         personGeneration: PersonGeneration.ALLOW_ADULT,
