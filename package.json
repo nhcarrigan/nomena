@@ -1,0 +1,32 @@
+{
+  "name": "nomena",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint src --max-warnings 0",
+    "start": "op run --env-file=prod.env -- node prod/index.js",
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.19.0",
+  "devDependencies": {
+    "@nhcarrigan/eslint-config": "5.2.0",
+    "@nhcarrigan/typescript-config": "4.0.0",
+    "@types/node": "24.9.2",
+    "eslint": "9.38.0",
+    "typescript": "5.9.3"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "0.68.0",
+    "@google/genai": "1.28.0",
+    "@nhcarrigan/discord-analytics": "0.0.6",
+    "@nhcarrigan/logger": "1.1.1",
+    "discord.js": "14.24.2",
+    "fastify": "5.6.1"
+  }
+}
