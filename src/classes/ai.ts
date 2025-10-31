@@ -5,7 +5,7 @@
  */
 
 import { Anthropic } from "@anthropic-ai/sdk";
-import { GoogleGenAI, PersonGeneration, SafetyFilterLevel } from "@google/genai";
+import { GoogleGenAI, PersonGeneration } from "@google/genai";
 import { AttachmentBuilder, type MessageCreateOptions } from "discord.js";
 
 /**
@@ -50,7 +50,7 @@ export class Ai {
         join(", ")}`,
       prompt,
     );
-    const image = await this.generateImage(`Your task is to generate a full body anime girl mascot for this project. This means the full character should be visible. The image should have a transparent background. NEVER include text in the image. The project description is: ${prompt}`);
+    const image = await this.generateImage(`Your task is to generate a full body anime girl mascot for this project. The image should have a transparent background. NEVER include text in the image. The project description is: ${prompt}`);
     if (image === null) {
       return { content: `Project Name: ${names}\nProject Description: ${prompt}\nSorry, I was unable to generate an image for you.` };
     }
@@ -85,12 +85,11 @@ export class Ai {
   private async generateImage(prompt: string): Promise<Buffer | null> {
     const response = await this.gemini.models.generateImages({
       config: {
-        aspectRatio:       "3:4",
-        imageSize:         "2K",
-        numberOfImages:    1,
-        outputMimeType:    "image/png",
-        personGeneration:  PersonGeneration.ALLOW_ADULT,
-        safetyFilterLevel: SafetyFilterLevel.BLOCK_NONE,
+        aspectRatio:      "3:4",
+        imageSize:        "2K",
+        numberOfImages:   1,
+        outputMimeType:   "image/png",
+        personGeneration: PersonGeneration.ALLOW_ADULT,
       },
       model:  "models/imagen-4.0-generate-001",
       prompt: prompt,
