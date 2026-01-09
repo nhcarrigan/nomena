@@ -9,15 +9,14 @@ import { Client, Events, GatewayIntentBits } from "discord.js";
 import { Ai } from "./classes/ai.js";
 
 if (process.env.ANTHROPIC_API_KEY === undefined
-    || process.env.GEMINI_API_KEY === undefined
     || process.env.LOG_TOKEN === undefined
     || process.env.DISCORD_TOKEN === undefined) {
   throw new Error(
-    `ANTHROPIC_API_KEY, GEMINI_API_KEY, LOG_TOKEN, and DISCORD_TOKEN must be set.`,
+    `ANTHROPIC_API_KEY, LOG_TOKEN, and DISCORD_TOKEN must be set.`,
   );
 }
 
-const ai = new Ai(process.env.ANTHROPIC_API_KEY, process.env.GEMINI_API_KEY);
+const ai = new Ai(process.env.ANTHROPIC_API_KEY);
 const logger = new Logger("Nomena", process.env.LOG_TOKEN);
 
 const bot = new Client({
